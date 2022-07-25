@@ -9,6 +9,20 @@ class App extends Component {
 		filter: '',
   };
 
+	componentDidMount() {
+    const contactsLS = localStorage.getItem('contacts');
+    if (contactsLS) {
+      this.setState({contacts: JSON.parse(contactsLS)});
+    }
+  }
+
+  componentDidUpdate( prevProps, prevState  ) {
+		const { contacts } =  this.state;
+    if (contacts.length !== prevState.contacts.length) {
+      localStorage.setItem('contacts', JSON.stringify(contacts))
+    }
+  }
+
   addUserData = user => {
 		const { contacts } = this.state;
 		const a = contacts.find(({name}) => name === user.name)
@@ -36,13 +50,14 @@ class App extends Component {
 
   render() {
 		const { filter } = this.state;
+		const userList = this.getVisableUsers();
     return (
       <>  
 				<h1>Phonebook</h1>
           <ContactForm  addUserData={this.addUserData} />
 				<h2>Contacts</h2>
 					<Filter filter={filter} handlerFilter={this.handlerFilter}/>
-					<ContactList usersList={this.getVisableUsers()} deleteUser={this.deleteUser}/>
+					<ContactList usersList={userList} deleteUser={this.deleteUser}/>
       </>
     );
   }
